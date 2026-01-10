@@ -109,7 +109,32 @@ npm start
    ```
    NEXT_PUBLIC_API_BASE=https://x402-proxy.cxto21h.workers.dev
    ```
-3. Deploy automático en push a `main`
+3. Configura la raíz del proyecto: `dashboard/`
+4. Deploy automático en push a `main`
+
+## Deployment a Cloudflare Pages
+
+1. En Cloudflare Dashboard → Pages → Create Project
+2. Conecta tu repositorio (reflecterlabs/x402-proxy)
+3. Configura el build:
+   - **Framework preset**: Next.js
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dashboard/.next`
+   - **Root directory**: `dashboard/`
+4. Añade variable de entorno:
+   ```
+   NEXT_PUBLIC_API_BASE=https://x402-proxy.cxto21h.workers.dev
+   ```
+5. Deploy
+
+### Verificar Deployment
+
+Después del deploy, abre la URL de Pages (ej: `x402hub.pages.dev`) y verifica:
+- ✅ Dashboard carga correctamente
+- ✅ Botones de navegación funcionan
+- ✅ API llama a `/api/tenants` correctamente
+- ✅ Crear tenant funciona
+- ✅ Listar tenants muestra datos de DB
 
 ## Troubleshooting
 
