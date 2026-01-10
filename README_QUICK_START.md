@@ -1,10 +1,27 @@
-# x402hub - Multi-Tenant Payment Gateway
+# x402hub - Quick Start Guide
 
-**MVP deployed and live!** 🚀
+**🚀 Already deployed and live!**
 
-- **Dashboard**: https://x402-proxy.pages.dev/
-- **API**: https://x402-proxy.cxto21h.workers.dev/
-- **GitHub**: https://github.com/reflecterlabs/x402-proxy
+| Component | Status | URL |
+|-----------|--------|-----|
+| Dashboard | ✅ Live | https://x402-proxy.pages.dev/ |
+| API Server | ✅ Live | https://x402-proxy.cxto21h.workers.dev/ |
+| GitHub | ✅ Active | https://github.com/reflecterlabs/x402-proxy |
+
+---
+
+## 🎯 In 2 Minutes
+
+**Want to start right now?**
+
+1. Open https://x402-proxy.pages.dev/
+2. Click **"Connect Wallet"** (top right) → approve MetaMask
+3. Click **"+ New Tenant"** → fill form → click "Create"
+4. ✅ Done! Your first tenant is created
+
+**That's all!** See "Step-by-Step" below for full details.
+
+---
 
 ## What is x402hub?
 
@@ -26,46 +43,37 @@ A multi-tenant payment gateway using the **x402 protocol** for payment-gated con
 ### 1. Connect Your Wallet
 
 1. Open https://x402-proxy.pages.dev/
-2. Click **"Connect Wallet"** (top right)
-3. MetaMask popup will appear - approve the connection
-4. Your wallet address will appear in the button
+2. Look at the **top right corner** - you'll see **"Connect Wallet"** button
+3. Click it → MetaMask popup appears
+4. Click "Approve" to connect
+5. Your wallet address now shows in the button (e.g., 0x1234...5678 in green)
 
-**Note**: Make sure you're on the **Base** network:
-- Testing: Base Sepolia (testnet)
-- Production: Base (mainnet)
-
-> **Need help?** See [WALLET_SETUP.md](./WALLET_SETUP.md) for detailed wallet setup instructions
+**Important:** Make sure MetaMask says you're on:
+- **Base Sepolia** (for testing) ← recommended
+- **Base** (for production)
 
 ### 2. Create a Multi-Tenant
 
-1. Click **"+ New Tenant"**
-2. Fill in the form:
-   - **Subdomain**: Your tenant's subdomain (e.g., "acme")
-   - **Wallet Address**: Auto-filled from your connected wallet
-   - **Network**: Base Sepolia (testing) or Base (production)
-   - **Origin URL** (optional): Where to proxy requests (e.g., https://api.example.com)
-   - **Origin Service** (optional): Cloudflare Worker binding name
-3. Click **"Create Tenant"**
+1. Click **"+ New Tenant"** button
+2. Fill the form:
+   - **Subdomain**: Your unique name (e.g., "mycompany", "api-test")
+   - **Tenant Name**: Display name (e.g., "My Company API")
+   - **Wallet Address**: AUTO-FILLED with your connected wallet ✓
+   - **Network**: Base Sepolia (default, good for testing)
+   - **Origin URL** (optional): Your backend API
+3. Click **"Create Tenant"** button
 
-Your new tenant URL will be: `https://<subdomain>.example.com`
+**That's it!** Your tenant is created.
 
-### 3. Set Up Protected Routes
+### 3. Set Up Protected Routes (Next Step)
 
-After creating a tenant, add payment-gated routes:
+After creating a tenant:
+1. Go to **"Tenants"** tab
+2. Click your new tenant
+3. Add protected routes with pricing
+4. Example: `/api/premium/*` = $0.01
 
-1. Click on your tenant in the **"Tenants"** view
-2. Add protected routes with pricing (e.g., `/api/premium/*` = $0.01)
-3. Users will need to pay to access these routes
-
-### 4. Get Paid
-
-When users access a protected route:
-
-1. They receive a **402 Payment Required** response
-2. They pay via the x402 protocol (using their wallet)
-3. x402hub verifies the payment
-4. User gets a **JWT token** valid for 1 hour
-5. **You receive payment** at your wallet address
+Users will need to pay to access protected routes.
 
 ---
 

@@ -79,7 +79,11 @@ tenantsAPI.post('/', async (c) => {
 			.map(x => x.toString(16).padStart(2, '0'))
 			.join('');
 
+		// Generate tenant ID from subdomain (or use UUID)
+		const tenantId = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
 		console.log('About to insert tenant:', {
+			id: tenantId,
 			subdomain,
 			name,
 			wallet_address,
@@ -89,12 +93,13 @@ tenantsAPI.post('/', async (c) => {
 		});
 
 		const stmt = db.prepare(`
-			INSERT INTO tenants (subdomain, name, wallet_address, network, origin_url, origin_service, jwt_secret, status, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
+			INSERT INTO tenants (id, subdomain, name, wallet_address, network, origin_url, origin_service, jwt_secret, status, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
 		`);
 		
 		const now = Math.floor(Date.now() / 1000);
 		const result = await stmt.bind(
+			tenantId,
 			subdomain,
 			name,
 			wallet_address,
@@ -114,7 +119,7 @@ tenantsAPI.post('/', async (c) => {
 		return c.json({
 			success: true,
 			data: {
-				id: result.meta.last_row_id,
+				id: tenantId,
 				subdomain,
 				name,
 				wallet_address,
