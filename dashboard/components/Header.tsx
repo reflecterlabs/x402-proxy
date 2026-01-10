@@ -1,3 +1,5 @@
+import ConnectWallet from './ConnectWallet'
+
 export default function Header({ view, setView }: any) {
   return (
     <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
@@ -36,6 +38,8 @@ export default function Header({ view, setView }: any) {
             + New Tenant
           </button>
         </nav>
+
+        <ConnectWallet />
       </div>
     </header>
   )

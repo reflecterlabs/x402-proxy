@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from './providers'
 
 export const metadata: Metadata = {
   title: 'x402hub Dashboard',
@@ -13,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gradient-to-br from-white to-gray-50">{children}</body>
+      <body className="bg-gradient-to-br from-white to-gray-50">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
