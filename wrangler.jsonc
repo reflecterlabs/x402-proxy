@@ -26,9 +26,8 @@
 		{
 			"binding": "DB",
 			"database_name": "x402hub-db",
-			"database_id": "preview-database-id",
-			// TODO: After creating D1 database, replace database_id above with actual ID from:
-			// wrangler d1 create x402hub-db
+			"database_id": "6239da48-c2fb-4b19-b9a4-f03f64544540",
+			"remote": true
 		},
 	],
 	// =========================================================================
@@ -40,9 +39,7 @@
 	"kv_namespaces": [
 		{
 			"binding": "TENANT_CACHE",
-			"id": "preview-kv-id",
-			// TODO: After creating KV namespace, replace id above with actual ID from:
-			// wrangler kv namespace create TENANT_CACHE
+			"id": "3e307e18b1fb4ded8cf7933f6d93fe4c",
 		},
 	],
 	// =========================================================================
