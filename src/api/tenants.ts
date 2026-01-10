@@ -65,6 +65,8 @@ tenantsAPI.post('/', async (c) => {
 	const db = c.env.DB;
 	const body = await c.req.json();
 	
+	console.log('Creating tenant with data:', body);
+	
 	const { subdomain, wallet_address, network, origin_url, origin_service, jwt_secret } = body;
 	
 	if (!subdomain || !wallet_address) {
@@ -76,6 +78,14 @@ tenantsAPI.post('/', async (c) => {
 		const secret = jwt_secret || Array.from(crypto.getRandomValues(new Uint8Array(32)))
 			.map(x => x.toString(16).padStart(2, '0'))
 			.join('');
+
+		console.log('About to insert tenant:', {
+			subdomain,
+			wallet_address,
+			network: network || 'base-sepolia',
+			origin_url: origin_url || null,
+			origin_service: origin_service || null,
+		});
 
 		const stmt = db.prepare(`
 			INSERT INTO tenants (subdomain, wallet_address, network, origin_url, origin_service, jwt_secret, status)
@@ -90,6 +100,8 @@ tenantsAPI.post('/', async (c) => {
 			origin_service || null,
 			secret
 		).run();
+		
+		console.log('Tenant created successfully:', result.meta);
 		
 		// Invalidate cache
 		await c.env.TENANT_CACHE.delete(`tenant:${subdomain}`);
@@ -113,7 +125,12 @@ tenantsAPI.post('/', async (c) => {
 			return c.json({ success: false, error: 'Subdomain already exists' }, 409);
 		}
 		
-		return c.json({ success: false, error: 'Failed to create tenant' }, 500);
+		// Return more detailed error for debugging
+		return c.json({ 
+			success: false, 
+			error: 'Failed to create tenant',
+			details: error.message || 'Unknown error'
+		}, 500);
 	}
 });
 
