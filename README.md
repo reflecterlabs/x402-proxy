@@ -4,6 +4,28 @@
 
 A Cloudflare Worker that acts as a transparent proxy with payment-gated access using the [x402 protocol](https://x402.org) and stateless cookie-based authentication.
 
+## 🚀 x402hub - Multi-Tenant Platform (MVP)
+
+**The production platform is live!**
+
+- **Dashboard**: https://x402-proxy.pages.dev/ (Web3 connected)
+- **API**: https://x402-proxy.cxto21h.workers.dev/ (Multi-tenant routing)
+- **GitHub**: https://github.com/reflecterlabs/x402-proxy
+
+### Features
+✅ **Web3 Authentication** - Connect MetaMask/EVM wallets  
+✅ **Multi-Tenant** - Create multiple payment-gated domains  
+✅ **Real-time Stats** - Dashboard with revenue & metrics  
+✅ **x402 Payment** - Native crypto payment gating  
+✅ **JWT Sessions** - 1-hour access tokens  
+
+### Quick Links
+👉 **New to x402hub?** Start with [Quick Start Guide](./README_QUICK_START.md)  
+👉 **Need wallet setup?** See [Wallet Setup Guide](./WALLET_SETUP.md)  
+👉 **Agent setup?** See [Agent Setup Guide](./AGENTS.md)  
+
+---
+
 **Live Demo** - Try the built-in endpoints (other routes will fail as no origin is configured):
 
 - [/\_\_x402/health](https://x402proxy-template.news.eti.cfdata.org/__x402/health) - Public health check (200 OK)
