@@ -116,16 +116,18 @@ npm start
 
 1. En Cloudflare Dashboard → Pages → Create Project
 2. Conecta tu repositorio (reflecterlabs/x402-proxy)
-3. Configura el build:
+3. **IMPORTANTE**: Configura el build correctamente:
    - **Framework preset**: Next.js
    - **Build command**: `npm run build`
-   - **Build output directory**: `dashboard/.next`
-   - **Root directory**: `dashboard/`
-4. Añade variable de entorno:
+   - **Build output directory**: `.next` (por defecto, déjalo como está)
+   - **Root directory**: `dashboard/` ← **CRÍTICO**
+   
+4. Después de crear el proyecto, ve a **Settings → Environment variables** y añade:
    ```
-   NEXT_PUBLIC_API_BASE=https://x402-proxy.cxto21h.workers.dev
+   NEXT_PUBLIC_API_BASE = https://x402-proxy.cxto21h.workers.dev
+   Type: TEXT
    ```
-5. Deploy
+5. Click en "Deploy" (o redeploy si ya existe)
 
 ### Verificar Deployment
 
@@ -135,6 +137,20 @@ Después del deploy, abre la URL de Pages (ej: `x402hub.pages.dev`) y verifica:
 - ✅ API llama a `/api/tenants` correctamente
 - ✅ Crear tenant funciona
 - ✅ Listar tenants muestra datos de DB
+
+### Troubleshooting
+
+**"Build failed with error code 1"**
+- Verifica que el `root directory` sea `dashboard/`
+- Asegúrate de que `NEXT_PUBLIC_API_BASE` esté en Settings → Environment variables
+
+**"Page not found" (404)**
+- El build output directory debería detectarse automáticamente como `.next`
+- Si no funciona, intenta cambiar a `dashboard/.next`
+
+**"API calls failing"**
+- Verifica que la variable de entorno `NEXT_PUBLIC_API_BASE` esté setada
+- Comprueba que el Worker en `x402-proxy.cxto21h.workers.dev` está activo
 
 ## Troubleshooting
 
