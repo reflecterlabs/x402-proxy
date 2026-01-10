@@ -5,6 +5,9 @@ import { generateJWT } from "./jwt";
 import type { AppContext, Env } from "./env";
 import { extractSubdomain, getTenantConfig, logUsage } from "./db/tenant";
 import type { TenantConfig } from "./types/db";
+import { tenantsAPI } from "./api/tenants";
+import { routesAPI } from "./api/routes";
+import { statsAPI } from "./api/stats";
 
 const app = new Hono<AppContext>();
 
@@ -386,5 +389,12 @@ app.get("/__x402/protected", (c) => {
 		note: "This endpoint always requires payment or valid authentication cookie",
 	});
 });
+
+/**
+ * Platform API Routes - For managing tenants, routes, and stats
+ */
+app.route("/api/tenants", tenantsAPI);
+app.route("/api/routes", routesAPI);
+app.route("/api/stats", statsAPI);
 
 export default app;

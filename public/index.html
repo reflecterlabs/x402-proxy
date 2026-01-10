@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>x402 Dashboard</title>
+		<title>x402hub - Stripe for Data APIs</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -13,10 +13,12 @@
 		<style>
 			:root {
 				--color-primary: #f97316;
-				--color-text: #c2410c;
+				--color-text: #1f2937;
+				--color-text-light: #6b7280;
 				--color-bg: #ffffff;
 				--color-hover: #fff7ed;
 				--color-dark: #7c2d12;
+				--color-border: #e5e7eb;
 			}
 
 			* {
@@ -25,358 +27,247 @@
 				box-sizing: border-box;
 			}
 
-			body {
-				font-family: "Inter", sans-serif;
-				background-color: var(--color-bg);
-				background-image: radial-gradient(
-					circle,
-					rgba(249, 115, 22, 0.4) 1px,
-					transparent 1px
-				);
-				background-size: 24px 24px;
-				color: var(--color-text);
-				min-height: 100vh;
+			html, body {
+				height: 100%;
 			}
 
-			/* Main Container */
-			.main-container {
-				max-width: 1400px;
-				margin: 0 auto;
-				border: 1px solid var(--color-primary);
-				min-height: 100vh;
-				margin-top: 40px;
-				margin-bottom: 40px;
-				background: var(--color-bg);
+			body {
+				font-family: "Inter", sans-serif;
+				background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+				color: var(--color-text);
+				line-height: 1.6;
+			}
+
+			/* Header/Nav */
+			header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 1.5rem 2rem;
+				border-bottom: 1px solid var(--color-border);
+				background: rgba(255, 255, 255, 0.8);
+				backdrop-filter: blur(10px);
+			}
+
+			.logo {
+				font-size: 1.5rem;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+				color: var(--color-dark);
+			}
+
+			.logo span {
+				color: var(--color-primary);
+			}
+
+			nav {
+				display: flex;
+				gap: 1rem;
+				align-items: center;
+			}
+
+			/* Main */
+			main {
+				min-height: calc(100vh - 80px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 2rem;
+			}
+
+			.hero {
+				max-width: 700px;
+				text-align: center;
+			}
+
+			.hero h1 {
+				font-size: 3.5rem;
+				font-weight: 800;
+				letter-spacing: -0.03em;
+				margin-bottom: 1rem;
+				line-height: 1.1;
+			}
+
+			.hero h1 .highlight {
+				color: var(--color-primary);
+			}
+
+			.hero p {
+				font-size: 1.25rem;
+				color: var(--color-text-light);
+				margin-bottom: 2rem;
+				line-height: 1.6;
+			}
+
+			.cta-group {
+				display: flex;
+				gap: 1rem;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+
+			.btn {
+				padding: 0.875rem 2rem;
+				border-radius: 8px;
+				font-size: 1rem;
+				font-weight: 600;
+				border: none;
+				cursor: pointer;
+				text-decoration: none;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				transition: all 0.3s ease;
+				font-family: inherit;
 			}
 
 			.btn-primary {
 				background: var(--color-primary);
 				color: white;
-				padding: 0.75rem 1.5rem;
-				border-radius: 9999px;
-				text-decoration: none;
-				font-weight: 600;
-				font-size: 0.95rem;
-				transition: background 0.2s;
 			}
 
 			.btn-primary:hover {
 				background: var(--color-dark);
+				transform: translateY(-2px);
+				box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2);
 			}
 
-			.btn-outline {
+			.btn-secondary {
 				background: transparent;
-				color: var(--color-primary);
-				padding: 0.75rem 1.5rem;
-				border-radius: 9999px;
-				text-decoration: none;
-				font-weight: 600;
-				font-size: 0.95rem;
-				border: 2px solid var(--color-primary);
-				transition: all 0.2s;
+				color: var(--color-text);
+				border: 2px solid var(--color-border);
 			}
 
-			.btn-outline:hover {
+			.btn-secondary:hover {
+				border-color: var(--color-primary);
+				color: var(--color-primary);
 				background: var(--color-hover);
 			}
 
-			/* Header */
-			.header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				padding: 1.25rem 1.5rem;
-				border-bottom: 1px solid var(--color-primary);
-			}
-			.brand {
-				display: flex;
-				align-items: center;
-				gap: 0.75rem;
-			}
-			.brand img {
-				width: 36px;
-				height: 36px;
-			}
-			.brand h1 {
-				font-size: 1.25rem;
-				font-weight: 800;
-				letter-spacing: -0.02em;
-				color: var(--color-dark);
-			}
-			.pill {
-				font-family: monospace;
-				font-size: 0.8rem;
-				border: 1px solid var(--color-primary);
-				background: var(--color-hover);
-				padding: 0.25rem 0.5rem;
-				border-radius: 999px;
+			/* Features Grid */
+			.features {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 2rem;
+				margin-top: 4rem;
+				padding-top: 3rem;
+				border-top: 1px solid var(--color-border);
 			}
 
-			/* Grid */
-			.grid {
-				display: grid;
-				grid-template-columns: repeat(12, 1fr);
-				gap: 1rem;
-				padding: 1rem;
+			.feature {
+				text-align: left;
 			}
-			.card {
-				border: 1px solid var(--color-primary);
-				border-radius: 8px;
-				background: var(--color-bg);
+
+			.feature-icon {
+				font-size: 2rem;
+				margin-bottom: 0.5rem;
 			}
-			.card-header {
-				padding: 0.9rem 1rem;
-				border-bottom: 1px solid var(--color-primary);
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
+
+			.feature h3 {
+				font-size: 1.1rem;
+				font-weight: 700;
+				margin-bottom: 0.5rem;
+				color: var(--color-text);
 			}
-			.card-title {
+
+			.feature p {
 				font-size: 0.95rem;
-				font-weight: 800;
-				color: var(--color-dark);
-				letter-spacing: -0.01em;
-			}
-			.card-body {
-				padding: 1rem;
-			}
-			.muted {
-				color: #7c2d12aa;
-			}
-			.kvs {
-				display: grid;
-				grid-template-columns: 180px 1fr;
-				gap: 0.5rem 1rem;
-				font-size: 0.9rem;
-			}
-			.mono { font-family: monospace; }
-			.ok { color: #16a34a; font-weight: 700; }
-			.warn { color: #f59e0b; font-weight: 700; }
-			.err { color: #dc2626; font-weight: 700; }
-			.badge { border: 1px solid var(--color-primary); border-radius: 6px; padding: 0.1rem 0.4rem; font-size: 0.75rem; background: var(--color-hover); }
-			.list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-			.small { font-size: 0.85rem; }
-			.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-			pre.code { background: var(--color-hover); border: 1px solid var(--color-primary); padding: 0.75rem; border-radius: 6px; overflow: auto; }
-
-			/* Footer */
-			footer {
-				border-top: 1px solid var(--color-primary);
-				padding: 2rem;
-				text-align: center;
-				font-size: 0.9rem;
-			}
-
-			footer a {
-				color: var(--color-primary);
-				text-decoration: none;
-			}
-
-			footer a:hover {
-				text-decoration: underline;
+				color: var(--color-text-light);
 			}
 
 			/* Responsive */
+			@media (max-width: 1024px) {
+				.features {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+
 			@media (max-width: 768px) {
-				.feature-grid {
+				header {
+					padding: 1rem;
+				}
+
+				.logo {
+					font-size: 1.25rem;
+				}
+
+				nav {
+					flex-direction: column;
+					gap: 0.5rem;
+					width: 100%;
+				}
+
+				main {
+					padding: 1rem;
+				}
+
+				.hero h1 {
+					font-size: 2.5rem;
+				}
+
+				.hero p {
+					font-size: 1.1rem;
+				}
+
+				.cta-group {
+					flex-direction: column;
+				}
+
+				.btn {
+					width: 100%;
+					justify-content: center;
+				}
+
+				.features {
 					grid-template-columns: 1fr;
+					margin-top: 2rem;
+					gap: 1.5rem;
 				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="logo">x402<span>hub</span></div>
+			<nav>
+				<a href="https://github.com/reflecterlabs/x402-proxy" target="_blank" class="btn btn-secondary">GitHub</a>
+			</nav>
+		</header>
 
-				.feature-list {
-					border-right: none;
-					border-bottom: 1px solid var(--color-primary);
-				}
+		<main>
+			<div class="hero">
+				<h1>Stripe for <span class="highlight">Data APIs</span></h1>
+				<p>Add pay-per-query pricing to your API. Get paid in USDC. No infrastructure headaches.</p>
 
-				.hero {
-					padding: 4rem 1.5rem;
-				}
+				<div class="cta-group">
+					<button class="btn btn-primary" onclick="goToDashboard()">Try Now</button>
+					<a href="https://github.com/reflecterlabs/x402-proxy" target="_blank" class="btn btn-secondary">Documentation</a>
+				</div>
 
-				.main-container {
-					margin: 40px 10px;
-				}
-			<div class="main-container">
-				<header class="header">
-					<div class="brand">
-						<img src="/x402-icon.svg" alt="x402 icon" />
-						<h1>x402 Dashboard</h1>
+				<div class="features">
+					<div class="feature">
+						<div class="feature-icon">⚡</div>
+						<h3>5 Minute Setup</h3>
+						<p>Deploy in minutes, not months. No code changes needed to your API.</p>
 					</div>
-					<div class="actions">
-						<a class="btn-outline" href="/__x402/health" target="_blank">Health</a>
-						<a class="btn-outline" href="/__x402/config" target="_blank">Config</a>
-						<a class="btn-primary" href="/__x402/protected" target="_blank">Try Protected</a>
+					<div class="feature">
+						<div class="feature-icon">💰</div>
+						<h3>Get Paid Instantly</h3>
+						<p>Receive payments directly to your crypto wallet. USDC on Base.</p>
 					</div>
-				</header>
-
-				<section class="grid">
-					<!-- Health -->
-					<div class="card" style="grid-column: span 4">
-						<div class="card-header">
-							<span class="card-title">Deployment Health</span>
-							<button class="btn-outline small" id="btn-refresh-health">Refresh</button>
-						</div>
-						<div class="card-body">
-							<div class="kvs">
-								<div>Status</div>
-								<div id="health-status" class="muted">loading…</div>
-								<div>Timestamp</div>
-								<div id="health-time" class="muted">—</div>
-								<div>Environment</div>
-								<div class="pill" id="env-host">—</div>
-							</div>
-						</div>
+					<div class="feature">
+						<div class="feature-icon">📊</div>
+						<h3>Full Control</h3>
+						<p>Set your own pricing per endpoint. See real-time revenue and usage.</p>
 					</div>
-
-					<!-- Config -->
-					<div class="card" style="grid-column: span 8">
-						<div class="card-header">
-							<span class="card-title">Current Configuration</span>
-							<button class="btn-outline small" id="btn-refresh-config">Refresh</button>
-						</div>
-						<div class="card-body">
-							<div class="kvs">
-								<div>Network</div>
-								<div id="cfg-network" class="pill">—</div>
-								<div>Pay To</div>
-								<div id="cfg-payto" class="mono">—</div>
-								<div>Origin Mode</div>
-								<div id="cfg-origin" class="pill">—</div>
-								<div>Protected Patterns</div>
-								<div id="cfg-patterns" class="list">—</div>
-							</div>
-							<div style="margin-top: 0.75rem" class="muted small">
-								Tip: Configure these in wrangler.jsonc vars (restart deploy to apply).
-							</div>
-						</div>
-					</div>
-
-					<!-- Quick Tests -->
-					<div class="card" style="grid-column: span 6">
-						<div class="card-header">
-							<span class="card-title">Quick Tests</span>
-							<div class="actions">
-								<button class="btn-outline small" id="btn-test-health">GET /__x402/health</button>
-								<button class="btn-outline small" id="btn-test-config">GET /__x402/config</button>
-								<button class="btn-primary small" id="btn-test-protected">GET /__x402/protected</button>
-							</div>
-						</div>
-						<div class="card-body">
-							<pre class="code" id="test-output">Click a button to run a test…</pre>
-						</div>
-					</div>
-
-					<!-- How to Pay/Test -->
-					<div class="card" style="grid-column: span 6">
-						<div class="card-header">
-							<span class="card-title">How to Test Payments</span>
-						</div>
-						<div class="card-body">
-							<ol class="small" style="line-height: 1.7">
-								<li>Use Base Sepolia testnet (default) and the dead address (for testing only).</li>
-								<li>Request a protected path → you’ll get 402 Payment Required with instructions.</li>
-								<li>Run the provided test client to auto-complete the flow and set the cookie.</li>
-							</ol>
-							<div style="height: 0.75rem"></div>
-							<pre class="code"># In your terminal
-					<a href="https://www.x402.org/">x402 Protocol</a>
-				</p>
-							<div style="height: 0.5rem"></div>
-							<div class="muted small">See TESTING.md for details. After payment, a 1-hour JWT cookie is set.</div>
-						</div>
-					</div>
-
-					<!-- Checklist -->
-					<div class="card" style="grid-column: span 12">
-						<div class="card-header">
-							<span class="card-title">Pre-Deploy Checklist</span>
-						</div>
-						<div class="card-body small">
-							<ul style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.5rem 1rem">
-								<li>• account_id set in wrangler.jsonc (if multiple accounts)</li>
-								<li>• assets disabled if proxying to an origin (comment out assets)</li>
-								<li>• ORIGIN_URL or ORIGIN_SERVICE set correctly (if used)</li>
-								<li>• JWT_SECRET created: wrangler secret put JWT_SECRET</li>
-								<li>• PROTECTED_PATTERNS configured with correct paths and prices</li>
-								<li>• routes configured (pattern + zone_name) for custom domains</li>
-							</ul>
-						</div>
-					</div>
-				</section>
-
-				<footer>
-					<p>
-						Built with
-						<a href="https://workers.cloudflare.com">Cloudflare Workers</a> •
-						<a href="/__x402/config">Config</a> •
-						<a href="/__x402/health">Health</a>
-					</p>
-				</footer>
+				</div>
 			</div>
+		</main>
 
-			<script>
-				const $ = (id) => document.getElementById(id);
-				const host = location.host;
-				$("env-host").textContent = host;
-
-				async function getJSON(path) {
-					const res = await fetch(path, { headers: { "Accept": "application/json" } });
-					const text = await res.text();
-					try { return { status: res.status, ok: res.ok, json: JSON.parse(text) }; }
-					catch { return { status: res.status, ok: res.ok, json: { raw: text } }; }
-				}
-
-				async function refreshHealth() {
-					const { status, ok, json } = await getJSON('/__x402/health');
-					$("health-status").innerHTML = ok ? `<span class="ok">ok</span>` : `<span class="err">${status}</span>`;
-					$("health-time").textContent = json.timestamp ? new Date(json.timestamp).toISOString() : '—';
-				}
-
-				async function refreshConfig() {
-					const { json } = await getJSON('/__x402/config');
-					$("cfg-network").textContent = json.network || '—';
-					$("cfg-payto").textContent = json.payTo || '—';
-
-					const origin = json.hasOriginService ? 'Service Binding' : (json.hasOriginUrl ? 'External URL' : 'DNS Proxy');
-					$("cfg-origin").textContent = origin;
-
-					const patterns = json.protectedPatterns || [];
-					const el = $("cfg-patterns");
-					el.innerHTML = '';
-					if (!patterns.length) {
-						el.innerHTML = '<span class="muted">None configured</span>';
-					} else {
-						patterns.forEach((p) => {
-							const span = document.createElement('span');
-							span.className = 'badge mono';
-							span.textContent = p;
-							el.appendChild(span);
-						});
-					}
-				}
-
-				function showOutput(obj) {
-					$("test-output").textContent = (typeof obj === 'string') ? obj : JSON.stringify(obj, null, 2);
-				}
-
-				async function runTest(path) {
-					const res = await fetch(path, { headers: { 'Accept': 'application/json' } });
-					const body = await res.text();
-					let parsed = body;
-					try { parsed = JSON.parse(body); } catch {}
-					showOutput({ status: res.status, headers: Object.fromEntries(res.headers.entries()), body: parsed });
-				}
-
-				$("btn-refresh-health").addEventListener('click', refreshHealth);
-				$("btn-refresh-config").addEventListener('click', refreshConfig);
-				$("btn-test-health").addEventListener('click', () => runTest('/__x402/health'));
-				$("btn-test-config").addEventListener('click', () => runTest('/__x402/config'));
-				$("btn-test-protected").addEventListener('click', () => runTest('/__x402/protected'));
-
-				// Initial load
-				refreshHealth();
-				refreshConfig();
-			</script>
-			</footer>
-		</div>
+		<script>
+			function goToDashboard() {
+				window.location.href = '/dashboard';
+			}
+		</script>
 	</body>
 </html>
