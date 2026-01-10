@@ -18,6 +18,10 @@ export interface Env extends CloudflareBindings {
 	ORIGIN_URL?: string;
 	/** Optional: Service Binding to origin Worker */
 	ORIGIN_SERVICE?: Fetcher;
+	/** D1 Database binding for multi-tenant storage */
+	DB: D1Database;
+	/** KV namespace for caching tenant configurations */
+	TENANT_CACHE: KVNamespace;
 }
 
 /** Full app context type for Hono */

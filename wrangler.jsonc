@@ -16,6 +16,36 @@
 		"directory": "public",
 	},
 	// =========================================================================
+	// D1 DATABASE - Multi-tenant storage
+	// =========================================================================
+	// Stores tenant configurations, protected routes, and usage logs.
+	// Create with: wrangler d1 create x402hub-db
+	// Apply schema: wrangler d1 execute x402hub-db --local --file=./db/schema.sql
+	//
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "x402hub-db",
+			"database_id": "preview-database-id",
+			// TODO: After creating D1 database, replace database_id above with actual ID from:
+			// wrangler d1 create x402hub-db
+		},
+	],
+	// =========================================================================
+	// KV NAMESPACE - Tenant config cache
+	// =========================================================================
+	// Caches tenant configurations to avoid hitting D1 on every request.
+	// Create with: wrangler kv namespace create TENANT_CACHE
+	//
+	"kv_namespaces": [
+		{
+			"binding": "TENANT_CACHE",
+			"id": "preview-kv-id",
+			// TODO: After creating KV namespace, replace id above with actual ID from:
+			// wrangler kv namespace create TENANT_CACHE
+		},
+	],
+	// =========================================================================
 	// ROUTES - Where x402-proxy intercepts requests
 	// =========================================================================
 	// Uncomment and configure routes to deploy x402-proxy on your domain.
