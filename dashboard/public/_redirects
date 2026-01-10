@@ -1,4 +1,0 @@
-# Redirect all requests to Next.js SSG/SSR
-# This ensures proper routing for dynamic routes
-
-/*  /index.html  200
