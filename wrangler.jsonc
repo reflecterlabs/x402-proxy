@@ -12,9 +12,9 @@
 	"observability": {
 		"enabled": true,
 	},
-	"assets": {
-		"directory": "public",
-	},
+	// "assets": {
+	// 	"directory": "public",
+	// },
 	// =========================================================================
 	// D1 DATABASE - Multi-tenant storage
 	// =========================================================================
