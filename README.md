@@ -99,6 +99,23 @@ Visit `http://localhost:8787` to see the proxy in action.
 - Try `http://localhost:8787/__x402/health` for a public endpoint
 - Try `http://localhost:8787/__x402/protected` to see payment requirements
 
+### Dashboard
+
+Usa el dashboard Next.js para gestionar tenants y ver estadísticas:
+
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+
+Luego abre `http://localhost:3000` para acceder a:
+- 📊 **Dashboard** - Métricas en tiempo real (tenants, ingresos, solicitudes)
+- 👥 **Tenants** - CRUD completo (crear, leer, actualizar, desactivar)
+- 📈 **Estadísticas** - Revenue por ruta, análisis de uso
+
+Ver [DASHBOARD.md](./DASHBOARD.md) para documentación completa.
+
 ## Getting Started
 
 > _Already ran Quick Start above? Skip to [How It Works](#how-it-works)._
