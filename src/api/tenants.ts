@@ -67,10 +67,10 @@ tenantsAPI.post('/', async (c) => {
 	
 	console.log('Creating tenant with data:', body);
 	
-	const { subdomain, wallet_address, network, origin_url, origin_service, jwt_secret } = body;
+	const { subdomain, name, wallet_address, network, origin_url, origin_service, jwt_secret } = body;
 	
-	if (!subdomain || !wallet_address) {
-		return c.json({ success: false, error: 'Missing required fields: subdomain, wallet_address' }, 400);
+	if (!subdomain || !name || !wallet_address) {
+		return c.json({ success: false, error: 'Missing required fields: subdomain, name, wallet_address' }, 400);
 	}
 
 	try {
@@ -81,6 +81,7 @@ tenantsAPI.post('/', async (c) => {
 
 		console.log('About to insert tenant:', {
 			subdomain,
+			name,
 			wallet_address,
 			network: network || 'base-sepolia',
 			origin_url: origin_url || null,
@@ -88,17 +89,21 @@ tenantsAPI.post('/', async (c) => {
 		});
 
 		const stmt = db.prepare(`
-			INSERT INTO tenants (subdomain, wallet_address, network, origin_url, origin_service, jwt_secret, status)
-			VALUES (?, ?, ?, ?, ?, ?, 'active')
+			INSERT INTO tenants (subdomain, name, wallet_address, network, origin_url, origin_service, jwt_secret, status, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
 		`);
 		
+		const now = Math.floor(Date.now() / 1000);
 		const result = await stmt.bind(
 			subdomain,
+			name,
 			wallet_address,
 			network || 'base-sepolia',
 			origin_url || null,
 			origin_service || null,
-			secret
+			secret,
+			now,
+			now
 		).run();
 		
 		console.log('Tenant created successfully:', result.meta);
@@ -111,6 +116,7 @@ tenantsAPI.post('/', async (c) => {
 			data: {
 				id: result.meta.last_row_id,
 				subdomain,
+				name,
 				wallet_address,
 				network: network || 'base-sepolia',
 				origin_url,

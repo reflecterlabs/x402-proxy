@@ -10,6 +10,7 @@ export default function CreateTenantForm({ onSubmit }: any) {
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
     defaultValues: {
       subdomain: '',
+      name: '',
       wallet_address: '',
       network: 'base-sepolia',
       origin_url: '',
@@ -52,6 +53,18 @@ export default function CreateTenantForm({ onSubmit }: any) {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
           />
           {errors.subdomain && <p className="text-red-600 text-sm mt-1">{errors.subdomain.message}</p>}
+          <p className="text-xs text-gray-600 mt-1">Your unique domain prefix (e.g., "mycompany")</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">Tenant Name</label>
+          <input
+            {...register('name', { required: 'Tenant name is required' })}
+            placeholder="My Company API"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+          />
+          {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>}
+          <p className="text-xs text-gray-600 mt-1">Display name for your tenant (e.g., "Acme Corp API")</p>
         </div>
 
         <div>
