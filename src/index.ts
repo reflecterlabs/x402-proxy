@@ -30,6 +30,53 @@ const BUILTIN_PROTECTED_PATHS: ProtectedRouteConfig[] = [
 const BUILT_IN_PUBLIC_PATHS = ["/__x402/health", "/__x402/config"];
 
 /**
+ * Built-in test endpoint - always public, never requires payment
+ * Used for health checks and testing proxy functionality
+ */
+app.get("/__x402/health", (c) => {
+	return c.json({
+		status: "ok",
+		proxy: "x402-proxy",
+		message: "This endpoint is always public",
+		timestamp: Date.now(),
+	});
+});
+
+/**
+ * Config status endpoint - shows current configuration (no secrets exposed)
+ * Useful for debugging and verifying deployment
+ */
+app.get("/__x402/config", (c) => {
+	return c.json({
+		network: c.env.NETWORK,
+		payTo: c.env.PAY_TO ? `***${c.env.PAY_TO.slice(-6)}` : null,
+		hasOriginUrl: !!c.env.ORIGIN_URL,
+		hasOriginService: !!c.env.ORIGIN_SERVICE,
+		protectedPatterns: c.env.PROTECTED_PATTERNS?.map((p) => p.pattern) || [],
+	});
+});
+
+/**
+ * Built-in test endpoint - always protected, always requires payment
+ * Used for testing payment flow without needing to configure protected patterns
+ * This endpoint serves content directly (not proxied to origin)
+ */
+app.get("/__x402/protected", (c) => {
+	return c.json({
+		message: "Premium content accessed!",
+		timestamp: Date.now(),
+		note: "This endpoint always requires payment or valid authentication cookie",
+	});
+});
+
+/**
+ * Platform API Routes - For managing tenants, routes, and stats
+ */
+app.route("/api/tenants", tenantsAPI);
+app.route("/api/routes", routesAPI);
+app.route("/api/stats", statsAPI);
+
+/**
  * Proxy a request to the origin server.
  *
  * In multi-tenant mode, uses the tenant's configuration to determine routing.
@@ -349,52 +396,5 @@ app.use("*", async (c, next) => {
 
 	return originResponse;
 });
-
-/**
- * Built-in test endpoint - always public, never requires payment
- * Used for health checks and testing proxy functionality
- */
-app.get("/__x402/health", (c) => {
-	return c.json({
-		status: "ok",
-		proxy: "x402-proxy",
-		message: "This endpoint is always public",
-		timestamp: Date.now(),
-	});
-});
-
-/**
- * Config status endpoint - shows current configuration (no secrets exposed)
- * Useful for debugging and verifying deployment
- */
-app.get("/__x402/config", (c) => {
-	return c.json({
-		network: c.env.NETWORK,
-		payTo: c.env.PAY_TO ? `***${c.env.PAY_TO.slice(-6)}` : null,
-		hasOriginUrl: !!c.env.ORIGIN_URL,
-		hasOriginService: !!c.env.ORIGIN_SERVICE,
-		protectedPatterns: c.env.PROTECTED_PATTERNS?.map((p) => p.pattern) || [],
-	});
-});
-
-/**
- * Built-in test endpoint - always protected, always requires payment
- * Used for testing payment flow without needing to configure protected patterns
- * This endpoint serves content directly (not proxied to origin)
- */
-app.get("/__x402/protected", (c) => {
-	return c.json({
-		message: "Premium content accessed!",
-		timestamp: Date.now(),
-		note: "This endpoint always requires payment or valid authentication cookie",
-	});
-});
-
-/**
- * Platform API Routes - For managing tenants, routes, and stats
- */
-app.route("/api/tenants", tenantsAPI);
-app.route("/api/routes", routesAPI);
-app.route("/api/stats", statsAPI);
 
 export default app;
