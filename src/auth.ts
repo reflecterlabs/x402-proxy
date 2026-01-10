@@ -58,7 +58,7 @@ export interface ProtectedRouteConfig {
 	/** Price in USD (e.g. "$0.01") */
 	price: string;
 	/** Human-readable description of what the payment is for */
-	description: string;
+	description?: string;
 }
 
 /**

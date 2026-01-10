@@ -3,6 +3,8 @@ import { setCookie } from "hono/cookie";
 import { createProtectedRoute, type ProtectedRouteConfig } from "./auth";
 import { generateJWT } from "./jwt";
 import type { AppContext, Env } from "./env";
+import { extractSubdomain, getTenantConfig, logUsage } from "./db/tenant";
+import type { TenantConfig } from "./types/db";
 
 const app = new Hono<AppContext>();
 
@@ -27,6 +29,9 @@ const BUILT_IN_PUBLIC_PATHS = ["/__x402/health", "/__x402/config"];
 /**
  * Proxy a request to the origin server.
  *
+ * In multi-tenant mode, uses the tenant's configuration to determine routing.
+ * Falls back to env vars for single-tenant/dev mode.
+ *
  * Three modes:
  * 1. Service Binding (ORIGIN_SERVICE bound): Calls the bound Worker directly.
  *    Best for Worker-to-Worker communication within the same account.
@@ -39,16 +44,29 @@ const BUILT_IN_PUBLIC_PATHS = ["/__x402/health", "/__x402/config"];
  * 3. DNS-based (default): Uses fetch(request) which routes to the origin server
  *    defined in your DNS records. Best for traditional backends.
  */
-async function proxyToOrigin(request: Request, env: Env): Promise<Response> {
+async function proxyToOrigin(
+	request: Request,
+	env: Env,
+	tenantConfig?: TenantConfig | null,
+): Promise<Response> {
 	// Service Binding: call the bound Worker directly (highest priority)
-	if (env.ORIGIN_SERVICE) {
-		return env.ORIGIN_SERVICE.fetch(request);
+	// In multi-tenant mode, check tenant's origin_service first
+	const serviceBinding =
+		(tenantConfig?.tenant.origin_service &&
+			env[tenantConfig.tenant.origin_service as keyof Env]) ||
+		env.ORIGIN_SERVICE;
+
+	if (serviceBinding && typeof serviceBinding === "object" && "fetch" in serviceBinding) {
+		return (serviceBinding as Fetcher).fetch(request);
 	}
 
-	if (env.ORIGIN_URL) {
+	// External Origin mode: use tenant's origin_url or env ORIGIN_URL
+	const originUrl = tenantConfig?.tenant.origin_url || env.ORIGIN_URL;
+
+	if (originUrl) {
 		// External Origin mode: rewrite URL to target origin
 		const originalUrl = new URL(request.url);
-		const targetUrl = new URL(env.ORIGIN_URL);
+		const targetUrl = new URL(originUrl);
 
 		const proxiedUrl = new URL(request.url);
 		proxiedUrl.hostname = targetUrl.hostname;
@@ -123,12 +141,53 @@ function findProtectedRouteConfig(
 
 /**
  * Main proxy handler - intercepts protected routes, proxies everything else
+ * Supports multi-tenant routing by subdomain when DB/KV bindings are present.
+ * Falls back to single-tenant mode (env vars) for local development.
+ *
  * Note: This middleware runs for all routes, but route handlers below can still
  * take precedence by being registered after this middleware
  */
 app.use("*", async (c, next) => {
 	const path = c.req.path;
-	const protectedPatterns = c.env.PROTECTED_PATTERNS || [];
+	const hostname = new URL(c.req.url).hostname;
+	const startTime = Date.now();
+
+	// Extract subdomain for multi-tenant routing
+	const subdomain = extractSubdomain(hostname);
+	let tenantConfig: TenantConfig | null = null;
+	let protectedPatterns: ProtectedRouteConfig[] = [];
+	let jwtSecret: string | undefined;
+
+	// Multi-tenant mode: load config from D1/KV
+	if (subdomain && c.env.DB && c.env.TENANT_CACHE) {
+		tenantConfig = await getTenantConfig(subdomain, c.env);
+
+		if (!tenantConfig) {
+			return c.json({ error: `Tenant not found: ${subdomain}` }, 404);
+		}
+
+		// Map database routes to ProtectedRouteConfig format
+		protectedPatterns = tenantConfig.routes.map((r) => ({
+			pattern: r.pattern,
+			price: r.price_usd,
+			description: r.description || undefined,
+		}));
+
+		jwtSecret = tenantConfig.tenant.jwt_secret;
+
+		// Override env vars with tenant-specific config for x402 middleware
+		// TypeScript sees these as readonly but at runtime we can override them
+		// for the scope of this request
+		(c.env as any).PAY_TO = tenantConfig.tenant.wallet_address;
+		(c.env as any).NETWORK = tenantConfig.tenant.network;
+		if (tenantConfig.tenant.facilitator_url) {
+			(c.env as any).FACILITATOR_URL = tenantConfig.tenant.facilitator_url;
+		}
+	} else {
+		// Single-tenant mode: use env vars (local dev or legacy deployment)
+		protectedPatterns = c.env.PROTECTED_PATTERNS || [];
+		jwtSecret = c.env.JWT_SECRET;
+	}
 
 	// Special handling for built-in endpoints
 	// These are handled by route handlers below, not proxied
@@ -140,7 +199,7 @@ app.use("*", async (c, next) => {
 	const protectedConfig = findProtectedRouteConfig(path, protectedPatterns);
 	if (protectedConfig) {
 		// Ensure JWT_SECRET is configured before processing protected routes
-		if (!c.env.JWT_SECRET) {
+		if (!jwtSecret) {
 			return c.json(
 				{
 					error:
@@ -162,7 +221,7 @@ app.use("*", async (c, next) => {
 				// This is a new payment - generate JWT cookie
 				// Note: This runs after payment verification but BEFORE settlement.
 				// We'll check if settlement succeeded before actually using the token.
-				jwtToken = await generateJWT(c.env.JWT_SECRET, 3600);
+				jwtToken = await generateJWT(jwtSecret, 3600);
 			}
 
 			// Do nothing here - we'll proxy after middleware returns
@@ -200,7 +259,33 @@ app.use("*", async (c, next) => {
 		}
 
 		// Proxy the authenticated request to origin
-		const originResponse = await proxyToOrigin(c.req.raw, c.env);
+		const originResponse = await proxyToOrigin(c.req.raw, c.env, tenantConfig);
+
+		// Log usage if in multi-tenant mode
+		if (tenantConfig && c.env.DB) {
+			const responseTime = Date.now() - startTime;
+			const routeMatch = tenantConfig.routes.find((r) =>
+				pathMatchesPattern(path, r.pattern),
+			);
+
+			// Fire and forget - don't block response
+			c.executionCtx.waitUntil(
+				logUsage(
+					{
+						tenant_id: tenantConfig.tenant.id,
+						route_id: routeMatch?.id || null,
+						path,
+						method: c.req.method,
+						status_code: originResponse.status,
+						payment_verified: jwtToken ? 1 : 0, // 1 if new payment, 0 if cached cookie
+						client_ip: c.req.header("CF-Connecting-IP") || null,
+						user_agent: c.req.header("User-Agent") || null,
+						response_time_ms: responseTime,
+					},
+					c.env,
+				),
+			);
+		}
 
 		// If we generated a JWT token, add it as a cookie to the response
 		if (jwtToken) {
@@ -235,7 +320,31 @@ app.use("*", async (c, next) => {
 	}
 
 	// Proxy unprotected routes directly to origin
-	return proxyToOrigin(c.req.raw, c.env);
+	const originResponse = await proxyToOrigin(c.req.raw, c.env, tenantConfig);
+
+	// Log usage for unprotected routes too (if multi-tenant)
+	if (tenantConfig && c.env.DB) {
+		const responseTime = Date.now() - startTime;
+
+		c.executionCtx.waitUntil(
+			logUsage(
+				{
+					tenant_id: tenantConfig.tenant.id,
+					route_id: null, // Unprotected route
+					path,
+					method: c.req.method,
+					status_code: originResponse.status,
+					payment_verified: 0, // No payment needed
+					client_ip: c.req.header("CF-Connecting-IP") || null,
+					user_agent: c.req.header("User-Agent") || null,
+					response_time_ms: responseTime,
+				},
+				c.env,
+			),
+		);
+	}
+
+	return originResponse;
 });
 
 /**
