@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration
+# This is for the Pages deployment, NOT the Worker
+# The Worker uses wrangler.jsonc in the same directory
+
+type = "javascript"
+
+[build]
+command = "cd dashboard && npm run build"
+cwd = "."
+
+[env.production]
+name = "x402hub-pages"
