@@ -7,7 +7,6 @@ import { ChipiClientProvider } from '@chipi-stack/nextjs'
 export function StarknetAuthProvider({ children }: { children: ReactNode }) {
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   const chipiKey = process.env.NEXT_PUBLIC_CHIPI_API_KEY
-  const chipiUrl = process.env.NEXT_PUBLIC_CHIPI_ALPHA_URL
 
   if (!clerkKey || !chipiKey) {
     return (
@@ -19,16 +18,22 @@ export function StarknetAuthProvider({ children }: { children: ReactNode }) {
             {!clerkKey && <li>- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</li>}
             {!chipiKey && <li>- NEXT_PUBLIC_CHIPI_API_KEY</li>}
           </ul>
+          <p className="text-xs text-gray-500 mt-4">See SETUP_CLERK_CHIPI.md for configuration instructions</p>
         </div>
       </div>
     )
   }
 
   return (
-    <ClerkProvider publishableKey={clerkKey}>
+    <ClerkProvider 
+      publishableKey={clerkKey}
+      signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
+      signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
+      afterSignInUrl={process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL}
+      afterSignUpUrl={process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
+    >
       <ChipiClientProvider 
         apiPublicKey={chipiKey}
-        alphaUrl={chipiUrl}
       >
         {children}
       </ChipiClientProvider>

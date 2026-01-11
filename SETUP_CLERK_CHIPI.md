@@ -1,7 +1,3 @@
-# Setup Clerk + ChipiPay para x402-proxy Dashboard
-
-El dashboard requiere dos servicios de autenticación/wallet configurados en Cloudflare Pages:
-
 ## 1. Setup Clerk (Autenticación)
 
 ### Crear cuenta Clerk
@@ -35,7 +31,8 @@ En Clerk Dashboard:
 ### Obtener credenciales ChipiPay
 
 Necesitarás:
-- **API Key** (Public): `chipi_pk_...`
+- **Public API Key**: `pk_prod_...`
+- **Secret API Key**: `sk_prod_...`
 - **Network**: `starknet-sepolia` (testnet) o `starknet-mainnet`
 
 ChipiPay proporciona fondos de testnet automáticamente en Sepolia.
@@ -50,12 +47,25 @@ ChipiPay proporciona fondos de testnet automáticamente en Sepolia.
 2. Selecciona **Settings** → **Environment variables**
 3. Añade las siguientes variables **para el environment Production**:
 
-| Variable | Valor | Notas |
-|----------|-------|-------|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_live_...` | De Clerk API Keys |
-| `CLERK_SECRET_KEY` | `sk_live_...` | De Clerk API Keys |
-| `NEXT_PUBLIC_CHIPI_API_KEY` | `chipi_pk_...` | De ChipiPay |
-| `NEXT_PUBLIC_CHIPI_ALPHA_URL` | `https://api.chippi.co` | URL de ChipiPay |
+```
+# Clerk Configuration (Autenticación)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ZWFnZXItZ29ibGluLTI0LmNsZXJrLmFjY291bnRzLmRldiQ
+CLERK_SECRET_KEY=sk_test_BMQNV3ny2qmDb7g5QwdsH6XXoGBdlG6yynjrA13gzF
+
+# Clerk URLs (No cambiar)
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# ChipiPay Configuration (Wallet - Starknet)
+NEXT_PUBLIC_CHIPI_API_KEY=pk_prod_fc53c56717524215e46aeb75b3998c50
+CHIPI_SECRET_KEY=sk_prod_8bf4a2aa05c891d3b8f0c3a81e47843ab8a09350d1f4086acaccdc82ad1616a6
+
+# Supabase Configuration (Base de datos)
+NEXT_PUBLIC_SUPABASE_URL=https://ogzgkkgomoixqlommtxu.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_hGoSJYWlxr1nQsx0gWKPKw_YFRIqxlE
+```
 
 4. Haz click en **Save and Deploy** → se redesplegará automáticamente
 
@@ -81,10 +91,16 @@ cd dashboard
 
 # Crear archivo .env.local
 cat > .env.local << EOF
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CHIPI_API_KEY=chipi_pk_...
-NEXT_PUBLIC_CHIPI_ALPHA_URL=https://api.chippi.co
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ZWFnZXItZ29ibGluLTI0LmNsZXJrLmFjY291bnRzLmRldiQ
+CLERK_SECRET_KEY=sk_test_BMQNV3ny2qmDb7g5QwdsH6XXoGBdlG6yynjrA13gzF
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+NEXT_PUBLIC_CHIPI_API_KEY=pk_prod_fc53c56717524215e46aeb75b3998c50
+CHIPI_SECRET_KEY=sk_prod_8bf4a2aa05c891d3b8f0c3a81e47843ab8a09350d1f4086acaccdc82ad1616a6
+NEXT_PUBLIC_SUPABASE_URL=https://ogzgkkgomoixqlommtxu.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_hGoSJYWlxr1nQsx0gWKPKw_YFRIqxlE
 EOF
 
 # Iniciar servidor
@@ -114,15 +130,16 @@ Deberías ver:
 
 **Solución**:
 1. Ve a Cloudflare Pages → x402-proxy → Settings → Environment variables
-2. Verifica que TODAS las variables estén presentes
+2. Verifica que TODAS las variables estén presentes (8 variables en total)
 3. Para cambios, redeploy: Pages → Deployments → "Retry build" en el último
 
-### Error: "MetaMask o compatible" en el dashboard
+### Error: "ChipiPay no está configurado correctamente"
 
-**Causa**: ChipiPay no está cargando correctamente (falta API Key)
+**Causa**: Las claves de ChipiPay son incorrectas o no están configuradas
 
 **Solución**:
-- Verifica `NEXT_PUBLIC_CHIPI_API_KEY` esté configurada
+- Verifica `NEXT_PUBLIC_CHIPI_API_KEY` y `CHIPI_SECRET_KEY` en Cloudflare
+- Deben comenzar con `pk_prod_` y `sk_prod_` respectivamente
 - Espera a que el redeploy termine (2-3 minutos)
 - Limpia cache del navegador: `Ctrl+Shift+Delete` o modo incógnito
 
@@ -133,16 +150,17 @@ Deberías ver:
 **Solución**:
 - Copia exactamente desde Clerk dashboard (sin espacios)
 - Debe comenzar con `pk_`
+- Verifica `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth` esté configurada
 - Redeploy: push a GitHub o retry build en Pages
 
-### ChipiPay no conecta wallet
+### Supabase - Error de conexión
 
-**Causa**: Red equivocada o API Key de prod vs testnet
+**Causa**: Variables de Supabase no configuradas
 
 **Solución**:
-- Para testnet: asegúrate que `NEXT_PUBLIC_CHIPI_API_KEY` es de Sepolia
-- Para prod: usa API Key de mainnet
-- En wrangler.jsonc: `NETWORK` debe ser `starknet-sepolia` (testnet) o `starknet-mainnet` (prod)
+- Verifica `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` en Cloudflare
+- Deben estar exactamente como se proporcionó
+- Se usan para almacenar datos de tenants y configuración
 
 ---
 
