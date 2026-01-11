@@ -2,10 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Export as static site for Cloudflare Pages
-  output: 'export',
-  // Disable dynamic features for static export
-  dynamicParams: true,
+  // Use default SSR mode for Cloudflare Pages (supports Server Actions)
+  // Pages will be on-demand generated
 };
 
 module.exports = nextConfig;
