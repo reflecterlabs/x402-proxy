@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 import { useGetWallet } from '@chipi-stack/nextjs'
-import { useUser, useAuth } from '@clerk/nextjs'
+import { useUser, useAuth as useClerkAuth } from '@clerk/nextjs'
 
 /**
  * Hook personalizado para obtener la wallet del usuario desde ChipiPay
@@ -10,14 +10,19 @@ import { useUser, useAuth } from '@clerk/nextjs'
  */
 export function useFetchWallet() {
   const { user: clerkUser } = useUser()
-  const { getToken: getClerkToken } = useAuth()
+  const { getToken } = useClerkAuth()
 
   const getBearerToken = useCallback(async () => {
     if (clerkUser) {
-      return await getClerkToken()
+      try {
+        return await getToken()
+      } catch (error) {
+        console.error('Error getting Clerk token:', error)
+        return null
+      }
     }
     return null
-  }, [clerkUser, getClerkToken])
+  }, [clerkUser, getToken])
 
   const activeUserId = clerkUser?.id
 
