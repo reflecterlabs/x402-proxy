@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chipi-stack/nextjs": "^11.22.0",
+    "@clerk/nextjs": "^6.36.6",
+    "@clerk/themes": "^2.4.47",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

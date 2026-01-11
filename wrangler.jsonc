@@ -82,12 +82,12 @@
 		// NETWORK - Blockchain network for payments (REQUIRED)
 		// =====================================================================
 		// Use "base-sepolia" for testing (free testnet tokens).
-		// Use "base" for production.
+		// Use "starknet-mainnet" for production.
 		//
-		// Get testnet tokens: https://docs.cdp.coinbase.com/faucets/
-		// Supported networks: https://x402.org
+		// ChipiPay provides testnet funds automatically.
+		// Supported networks: https://www.chipipay.com
 		//
-		"NETWORK": "base-sepolia",
+		"NETWORK": "starknet-sepolia",
 		// =====================================================================
 		// PROTECTED_PATTERNS - Routes requiring payment (REQUIRED)
 		// =====================================================================

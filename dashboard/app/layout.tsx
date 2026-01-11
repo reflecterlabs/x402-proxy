@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { AuthProvider } from './providers'
+import { StarknetAuthProvider } from './providers-starknet'
 
 export const metadata: Metadata = {
-  title: 'x402hub Dashboard',
-  description: 'Manage your payment-gated APIs',
+  title: 'x402hub Dashboard | Starknet Payment Gateway',
+  description: 'Manage your payment-gated APIs on Starknet with ChipiPay',
 }
 
 export default function RootLayout({
@@ -15,9 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gradient-to-br from-white to-gray-50">
-        <AuthProvider>
+        <StarknetAuthProvider>
           {children}
-        </AuthProvider>
+        </StarknetAuthProvider>
       </body>
     </html>
   )
