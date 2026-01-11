@@ -21,9 +21,9 @@ export default function ConnectWallet() {
     return (
       <button
         onClick={() => window.location.href = '/auth'}
-        className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-dark transition"
+        className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
       >
-        Conectar Wallet
+        Sign In
       </button>
     )
   }
