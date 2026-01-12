@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import { useFetchWallet } from '../lib/hooks/useFetchWallet'
 
 export default function CreateTenantForm({ onSubmit }: any) {
+  // Simplified tenant form - only requires tenant name
   const { user, isLoaded: userLoaded } = useUser()
   const { wallet, isLoading: walletLoading } = useFetchWallet()
   
