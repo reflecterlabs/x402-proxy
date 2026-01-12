@@ -12,6 +12,38 @@ import { statsAPI } from "./api/stats";
 const app = new Hono<AppContext>();
 
 /**
+ * CORS middleware - Allow requests from Cloudflare Pages and other origins
+ */
+app.use("*", async (c, next) => {
+	// Allow CORS from Cloudflare Pages dashboard and localhost for development
+	const origin = c.req.header("origin") || "";
+	const allowedOrigins = [
+		"https://x402-proxy.pages.dev",
+		"http://localhost:3000",
+		"http://localhost:8080",
+	];
+
+	const isAllowed = allowedOrigins.some((allowed) => {
+		return origin.includes(allowed) || origin.includes(".x402-proxy.pages.dev");
+	});
+
+	if (isAllowed || origin.endsWith(".x402-proxy.pages.dev")) {
+		c.header("Access-Control-Allow-Origin", origin);
+		c.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+		c.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+		c.header("Access-Control-Allow-Credentials", "true");
+		c.header("Access-Control-Max-Age", "86400");
+	}
+
+	// Handle preflight requests
+	if (c.req.method === "OPTIONS") {
+		return c.text("", 200);
+	}
+
+	await next();
+});
+
+/**
  * Built-in protected paths that always require payment
  * These are used for testing and don't need to be configured
  */
