@@ -103,8 +103,8 @@
 			{
 				"pattern": "/premium/*",
 				"price": "$0.01",
-				"description": "Access to premium content for 1 hour",
-			},
+				"description": "Access to premium content for 1 hour"
+			}
 		],
 		// =====================================================================
 		// ORIGIN_URL - External origin URL (OPTIONAL)
